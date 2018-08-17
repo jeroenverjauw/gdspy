@@ -61,6 +61,7 @@ __version__ = '1.3.1'
 _halfpi = 0.5 * numpy.pi
 _directions_dict = {'+x': 0, '+y': 0.5, '-x': 1, '-y': -0.5}
 _directions_list = ['+x', '+y', '-x', '-y']
+_max_points = 10000
 
 _bounding_boxes = {}
 
@@ -151,7 +152,7 @@ class PolygonSet(object):
     The last point should not be equal to the first (polygons are
     automatically closed).
 
-    The GDSII specification supports only a maximum of 199 vertices per
+    The GDSII specification supports only a maximum of _max_points vertices per
     polygon.
     """
 
@@ -163,10 +164,10 @@ class PolygonSet(object):
         self.polygons = [None] * len(polygons)
         for i in range(len(polygons)):
             self.polygons[i] = numpy.array(polygons[i])
-            if len(polygons[i]) > 199 and verbose:
+            if len(polygons[i]) > _max_points and verbose:
                 verbose = False
                 warnings.warn(
-                    "[GDSPY] A polygon with more than 199 points was "
+                    "[GDSPY] A polygon with more than _max_points points was "
                     "created (not officially supported by the GDSII "
                     "format).",
                     RuntimeWarning,
@@ -319,7 +320,7 @@ class PolygonSet(object):
                 path_area += 0.5 * abs(poly_area)
         return path_area
 
-    def fracture(self, max_points=199, precision=1e-3):
+    def fracture(self, max_points=_max_points, precision=1e-3):
         """
         Slice these polygons in the horizontal and vertical directions
         so that each resulting piece has at most ``max_points``.  This
@@ -377,7 +378,7 @@ class PolygonSet(object):
     def fillet(self,
                radius,
                points_per_2pi=128,
-               max_points=199,
+               max_points=_max_points,
                precision=1e-3):
         """
         Round the corners of these polygons and fractures them into
@@ -510,7 +511,7 @@ class Polygon(PolygonSet):
     The last point should not be equal to the first (polygons are
     automatically closed).
 
-    The GDSII specification supports only a maximum of 199 vertices per
+    The GDSII specification supports only a maximum of _max_points vertices per
     polygon.
 
     Examples
@@ -523,9 +524,9 @@ class Polygon(PolygonSet):
     __slots__ = 'layers', 'datatypes', 'polygons'
 
     def __init__(self, points, layer=0, datatype=0, verbose=True):
-        if len(points) > 199 and verbose:
+        if len(points) > _max_points and verbose:
             warnings.warn(
-                "[GDSPY] A polygon with more than 199 points was "
+                "[GDSPY] A polygon with more than _max_points points was "
                 "created (not officially supported by the GDSII "
                 "format).",
                 RuntimeWarning,
@@ -614,7 +615,7 @@ class Round(PolygonSet):
 
     Notes
     -----
-    The GDSII specification supports only a maximum of 199 vertices per
+    The GDSII specification supports only a maximum of _max_points vertices per
     polygon.
 
     Examples
@@ -637,7 +638,7 @@ class Round(PolygonSet):
                  initial_angle=0,
                  final_angle=0,
                  number_of_points=0.01,
-                 max_points=199,
+                 max_points=_max_points,
                  layer=0,
                  datatype=0):
         if isinstance(number_of_points, float):
@@ -1106,7 +1107,7 @@ class Path(PolygonSet):
             initial_angle,
             final_angle,
             number_of_points=0.01,
-            max_points=199,
+            max_points=_max_points,
             final_width=None,
             final_distance=None,
             layer=0,
@@ -1153,7 +1154,7 @@ class Path(PolygonSet):
 
         Notes
         -----
-        The GDSII specification supports only a maximum of 199 vertices
+        The GDSII specification supports only a maximum of _max_points vertices
         per polygon.
         """
         warn = True
@@ -1234,7 +1235,7 @@ class Path(PolygonSet):
              radius,
              angle,
              number_of_points=0.01,
-             max_points=199,
+             max_points=_max_points,
              final_width=None,
              final_distance=None,
              layer=0,
@@ -1282,7 +1283,7 @@ class Path(PolygonSet):
 
         Notes
         -----
-        The GDSII specification supports only a maximum of 199 vertices
+        The GDSII specification supports only a maximum of _max_points vertices
         per polygon.
         """
         exact = True
@@ -1328,7 +1329,7 @@ class Path(PolygonSet):
                    curve_function,
                    curve_derivative=None,
                    number_of_evaluations=99,
-                   max_points=199,
+                   max_points=_max_points,
                    final_width=None,
                    final_distance=None,
                    layer=0,
@@ -1384,7 +1385,7 @@ class Path(PolygonSet):
         The norm of the vector returned by ``curve_derivative`` is not
         important.  Only the direction is used.
 
-        The GDSII specification supports only a maximum of 199 vertices
+        The GDSII specification supports only a maximum of _max_points vertices
         per polygon.
 
         Examples
@@ -1536,7 +1537,7 @@ class L1Path(PolygonSet):
                  turn,
                  number_of_paths=1,
                  distance=0,
-                 max_points=199,
+                 max_points=_max_points,
                  layer=0,
                  datatype=0):
         if not isinstance(layer, list):
@@ -1778,7 +1779,7 @@ class PolyPath(PolygonSet):
                  distance=0,
                  corners=0,
                  ends=0,
-                 max_points=199,
+                 max_points=_max_points,
                  layer=0,
                  datatype=0):
         if not isinstance(layer, list):
@@ -3911,7 +3912,7 @@ def offset(polygons,
            tolerance=2,
            precision=0.001,
            join_first=False,
-           max_points=199,
+           max_points=_max_points,
            layer=0,
            datatype=0):
     """
@@ -3943,7 +3944,7 @@ def offset(polygons,
         If greater than 4, fracture the resulting polygons to ensure
         they have at most ``max_points`` vertices.  This is not a
         tessellating function, so this number should be as high as
-        possible.  For example, it should be set to 199 for polygons
+        possible.  For example, it should be set to _max_points for polygons
         being drawn in GDSII files.
     layer : integer
         The GDSII layer number for the resulting element.
@@ -3981,7 +3982,7 @@ def fast_boolean(operandA,
                  operandB,
                  operation,
                  precision=0.001,
-                 max_points=199,
+                 max_points=_max_points,
                  layer=0,
                  datatype=0):
     """
@@ -4008,7 +4009,7 @@ def fast_boolean(operandA,
         If greater than 4, fracture the resulting polygons to ensure
         they have at most ``max_points`` vertices.  This is not a
         tessellating function, so this number should be as high as
-        possible.  For example, it should be set to 199 for polygons
+        possible.  For example, it should be set to _max_points for polygons
         being drawn in GDSII files.
     layer : integer
         The GDSII layer number for the resulting element.
