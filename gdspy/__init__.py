@@ -61,7 +61,7 @@ __version__ = '1.3.1'
 _halfpi = 0.5 * numpy.pi
 _directions_dict = {'+x': 0, '+y': 0.5, '-x': 1, '-y': -0.5}
 _directions_list = ['+x', '+y', '-x', '-y']
-_max_points = 10000
+_max_points = 1e10
 
 _bounding_boxes = {}
 
