@@ -49,6 +49,7 @@ from gdspy import boolext
 from gdspy import clipper
 try:
     from gdspy.viewer import LayoutViewer
+    from gdspy.viewer import LayoutViewer2
 except ImportError as e:
     warnings.warn(
         "[GDSPY] LayoutViewer not available: " + str(e),
