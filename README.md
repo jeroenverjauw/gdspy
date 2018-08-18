@@ -32,7 +32,7 @@ Typical applications of gdspy are in the fields of electronic chip design, plana
 Option 1: using [pip](https://docs.python.org/3/installing/):
 
 ```sh
-pip install gdspy
+pip install git+https://github.com/jeroenverjauw/gdspy.git#egg=gdspy
 ```
 
 Option 2: download the source from [github](https://github.com/heitzmann/gdspy) and build/install with:
